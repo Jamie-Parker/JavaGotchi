@@ -4,8 +4,10 @@
  */
 package Assignment02;
 
+//extends Pet for status values
 
-public class PetStatus {//Pet Object Creator/ Status hunger, tired, bored, hygiene, illness / Boundary Control X/5
+
+public class PetStatus {
 
     private int hunger;
     private int tiredness;

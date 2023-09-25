@@ -4,13 +4,16 @@
  */
 package Assignment02;
 
+
+//Gets Current Time / Calculates difference between First Created time and Current Time / Calculates Age
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TimeStamp {//Gets Current Time / Calculates difference between First Created time and Current Time / Calculates Age
+public class TimeStamp {
 
     public String getTime() {//Uses Date Time to get current local time
 

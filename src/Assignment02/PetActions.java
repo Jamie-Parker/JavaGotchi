@@ -4,10 +4,14 @@
  */
 package Assignment02;
 
+
+//Pet actions / Feed, Sleep, Play, Clean, Heal / Time passed - increases Status over time 
+
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class PetActions {//Pet actions / Feed, Sleep, Play, Clean, Heal / Time passed - increases Status over time 
+public class PetActions {
 
     private static int state;
 

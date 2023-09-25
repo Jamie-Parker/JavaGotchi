@@ -4,13 +4,16 @@
  */
 package Assignment02;
 
+
+//Pet Object Creator / Sets Type, Colour, Name / State Control
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class PetCreator {//Pet Object Creator / Sets Type, Colour, Name / State Control
+public class PetCreator {
 
     public static int state = 2;
-    Display display = new Display();
+ 
     Scanner scanner = new Scanner(System.in);
 
     public int State() {
@@ -58,7 +61,7 @@ public class PetCreator {//Pet Object Creator / Sets Type, Colour, Name / State 
             }
         } catch (InputMismatchException e) {//Non Integer capture
             System.out.println("Please Type a Number (1 to 5)");
-            display.DisplayMenu(4);//Redisplay Pet Type Menu
+
             scanner.nextLine();
         }
     }
@@ -103,7 +106,7 @@ public class PetCreator {//Pet Object Creator / Sets Type, Colour, Name / State 
             }
         } catch (InputMismatchException e) {//Non Integer capture
             System.out.println("Please Type a Number (1 to 5)");
-            display.DisplayMenu(5);//Redisplay Pet Type Menu
+
             scanner.nextLine();
         }
     }

@@ -4,11 +4,16 @@
  */
 package Assignment02;
 
+//Creates the frames and items for the program
+
+
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -18,7 +23,15 @@ import javax.swing.*;
 public class GUI {
 
     private JFrame frame;
-
+    private Image dogPic = new ImageIcon("C:\\Users\\Moose\\Documents\\NetBeansProjects\\JavaGotchi\\dogholder.png").getImage();
+    private Image catPic = new ImageIcon("C:\\Users\\Moose\\Documents\\NetBeansProjects\\JavaGotchi\\catholder.png").getImage();
+    private Image rabPic = new ImageIcon("C:\\Users\\Moose\\Documents\\NetBeansProjects\\JavaGotchi\\rabtholder.png").getImage();
+    private Image mouPic = new ImageIcon("C:\\Users\\Moose\\Documents\\NetBeansProjects\\JavaGotchi\\mouholder.png").getImage();
+    private Image blankPic = new ImageIcon("C:\\Users\\Moose\\Documents\\NetBeansProjects\\JavaGotchi\\blankholder.png").getImage();
+    private String petType;
+    private String petColour;
+    private String petName;
+    
     public GUI() {
         frame = new JFrame("JavaGotchi");
         frame.setSize(860, 550);
@@ -97,7 +110,7 @@ public class GUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll();
-                createScreen();
+                createAnimalScreen();
                 frame.revalidate();
                 frame.repaint();
             }
@@ -117,17 +130,9 @@ public class GUI {
     public void loadScreen() {
         frame.getContentPane().removeAll();
 
-        Image dogPic = new ImageIcon("C:\\Users\\Moose\\Documents\\NetBeansProjects\\JavaGotchi\\dogholder.png").getImage();
-        Image catPic = new ImageIcon("C:\\Users\\Moose\\Documents\\NetBeansProjects\\JavaGotchi\\catholder.png").getImage();
-        Image rabPic = new ImageIcon("C:\\Users\\Moose\\Documents\\NetBeansProjects\\JavaGotchi\\rabtholder.png").getImage();
-        Image mouPic = new ImageIcon("C:\\Users\\Moose\\Documents\\NetBeansProjects\\JavaGotchi\\mouholder.png").getImage();
-        Image blankPic = new ImageIcon("C:\\Users\\Moose\\Documents\\NetBeansProjects\\JavaGotchi\\blankholder.png").getImage();
-        
-        
         //Read saved slots and identify what type of animal
         //load image into slot button
         //Include name into slot 1 label ie Slot1: BigDoggie
-        
         JButton slot1 = new JButton(new ImageIcon(dogPic));
         JButton slot2 = new JButton(new ImageIcon(catPic));
         JButton slot3 = new JButton(new ImageIcon(rabPic));
@@ -218,24 +223,84 @@ public class GUI {
         });
     }
 
-    public void createScreen() {
+    public void createAnimalScreen() {
         frame.getContentPane().removeAll();
-        JLabel title = new JLabel("Creator Menu");
+        JLabel title = new JLabel("Creator Menu: Pet Type");
+
+        JButton createDog = new JButton(new ImageIcon(dogPic));
+        JButton createCat = new JButton(new ImageIcon(catPic));
+        JButton createRabbit = new JButton(new ImageIcon(rabPic));
+        JButton createMouse = new JButton(new ImageIcon(mouPic));
 
         JButton backButton = new JButton("Back");
         JPanel backPanel = new JPanel();
+        JPanel centerPanel = new JPanel();
 
         backPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         backPanel.add(backButton);
         backPanel.add(title);
 
+        // Create a panel with GridLayout for the buttons
+        centerPanel.setLayout(new GridLayout(2, 2, 10, 10)); // 2 rows, 2 columns, and 10 pixels of horizontal and vertical spacing
+
+        // Add buttons to the grid layout panel
+        centerPanel.add(createDog);
+        centerPanel.add(createCat);
+        centerPanel.add(createRabbit);
+        centerPanel.add(createMouse);
+
         frame.setLayout(new BorderLayout());
         frame.add(backPanel, BorderLayout.NORTH);
+        frame.add(centerPanel, BorderLayout.CENTER);
 
         frame.revalidate();
         frame.repaint();
 
+        createDog.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                petType = "Dog";
+                createColourScreen(petType);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+
+        createCat.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                petType = "Cat";
+                createColourScreen(petType);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        
+        createRabbit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                petType = "Rabbit";
+                createColourScreen(petType);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        
+        createMouse.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                petType = "Mouse";
+                createColourScreen(petType);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -247,6 +312,104 @@ public class GUI {
         });
     }
 
+    public void createColourScreen(String petType) {
+        frame.getContentPane().removeAll();
+        JLabel title = new JLabel("Creator Menu: Colour");
+        
+        JButton backButton = new JButton("Back");
+        JPanel backPanel = new JPanel();
+        JPanel centerPanel = new JPanel();
+
+        JButton black = new JButton();
+        JButton white = new JButton();
+        JButton grey = new JButton();
+        JButton brown = new JButton();
+        
+        black.setBackground(Color.BLACK);
+        white.setBackground(Color.WHITE);
+        grey.setBackground(Color.GRAY);
+        Color brownColour = new Color(139, 69, 19);
+        brown.setBackground(brownColour);
+        
+        backPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        backPanel.add(backButton);
+        backPanel.add(title);
+        
+        
+        centerPanel.setLayout(new GridLayout(2, 2, 10, 10)); // 2 rows, 2 columns, and 10 pixels of horizontal and vertical spacing
+
+        // Add buttons to the grid layout panel
+        centerPanel.add(black);
+        centerPanel.add(white);
+        centerPanel.add(grey);
+        centerPanel.add(brown);
+        
+        frame.setLayout(new BorderLayout());
+        frame.add(backPanel, BorderLayout.NORTH);
+        frame.add(centerPanel, BorderLayout.CENTER);
+
+        frame.revalidate();
+        frame.repaint();
+
+         black.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+              petColour = "Black";
+                createNameScreen(petColour, petType);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+
+        white.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                 petColour = "White";
+                createNameScreen(petColour, petType);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        
+        grey.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                petColour = "Grey";
+                createNameScreen(petColour, petType);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        
+        brown.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                petColour = "Brown";
+                createNameScreen(petColour, petType);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+                backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                createAnimalScreen();
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+    }
+
+    public void createNameScreen(String petColour, String petType){
+        
+    }
+    
     public static void main(String[] args) {
 
         GUI gui = new GUI();

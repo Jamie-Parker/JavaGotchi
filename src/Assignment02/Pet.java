@@ -4,7 +4,12 @@
  */
 package Assignment02;
 
-public class Pet {//Pet Object that holds Pet Details
+
+
+//Pet Object that holds Pet Details
+
+
+public class Pet {
 
     private String petType;
     private String petColour;
