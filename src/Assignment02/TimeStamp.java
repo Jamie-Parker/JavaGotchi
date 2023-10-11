@@ -4,48 +4,29 @@
  */
 package Assignment02;
 
-
 //Gets Current Time / Calculates difference between First Created time and Current Time / Calculates Age
-
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.sql.Timestamp;
 
 public class TimeStamp {
 
-    public String getTime() {//Uses Date Time to get current local time
-
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy:MM:dd:HH:mm:ss");
-        String formattedDateTime = now.format(formatter);
-        return formattedDateTime;
+    public Timestamp getTimeStamp() {
+        return new Timestamp(System.currentTimeMillis());
     }
 
-    public long getTimeDifference(String time) {//Splits time string into date variables then calculates total minutes from first created or last saved time to current time
-
-        String[] timeValues = time.split(":");
-
-        int year = Integer.parseInt(timeValues[0]);
-        int month = Integer.parseInt(timeValues[1]);
-        int day = Integer.parseInt(timeValues[2]);
-        int hour = Integer.parseInt(timeValues[3]);
-        int minute = Integer.parseInt(timeValues[4]);
-        int second = Integer.parseInt(timeValues[5]);
-
+    public long getTimeDifference(Timestamp timeStamp) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime savedDateTime = LocalDateTime.of(year, month, day, hour, minute, second);
-
-        long minutesDifference = ChronoUnit.MINUTES.between(savedDateTime, now);//calculates difference in minutes 
-
+        Duration duration = Duration.between(timeStamp.toLocalDateTime(), now);
+        long minutesDifference = duration.toMinutes();
         return minutesDifference;
     }
 
     public static String ageCalc(long minutes) {//Uses minutes difference to determine total age since first created - Doesnt include seconds
 
         StringBuilder age = new StringBuilder();
-        age.append("Pet Age: ");
 
         if (minutes < 60) {//If created and checked within a minute
             age.append("New Born Baby!");
@@ -86,7 +67,7 @@ public class TimeStamp {
             }
             age.append(" old");
         }
-        age.append("\n");
+
         return age.toString();
     }
 }

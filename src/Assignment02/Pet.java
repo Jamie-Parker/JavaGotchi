@@ -4,25 +4,26 @@
  */
 package Assignment02;
 
-
+import java.util.Observable;
+import java.sql.Timestamp;
 
 //Pet Object that holds Pet Details
+public class Pet extends Observable {
 
+    public String petType;
+    public String petColour;
+    public String petName;
+    public Timestamp savedTime;
+    public Timestamp firstCreated;
+    public Timestamp timeStamp;
 
-public class Pet {
-
-    private String petType;
-    private String petColour;
-    private String petName;
-    private String savedTime;
-    private String firstCreated;
-
-    public Pet(String petType, String petColour, String petName, String savedTime, String firstCreated) {
+    public Pet(String petType, String petColour, String petName, Timestamp savedTime, Timestamp firstCreated) {
         this.petType = petType;
         this.petColour = petColour;
         this.petName = petName;
         this.savedTime = savedTime;
         this.firstCreated = firstCreated;
+
     }
 
     public String getPetType() {
@@ -31,6 +32,8 @@ public class Pet {
 
     public void setPetType(String petType) {
         this.petType = petType;
+        setChanged();
+        notifyObservers();
     }
 
     public String getPetColour() {
@@ -39,6 +42,8 @@ public class Pet {
 
     public void setPetColour(String petColour) {
         this.petColour = petColour;
+        setChanged();
+        notifyObservers();
     }
 
     public String getPetName() {
@@ -47,18 +52,39 @@ public class Pet {
 
     public void setPetName(String petName) {
         this.petName = petName;
+        setChanged();
+        notifyObservers();
     }
 
-    public String getSavedTime() {
+    public Timestamp getSavedTime() {
         return savedTime;
     }
 
-    public void setFirstCreated(String firstCreated) {
-        this.firstCreated = firstCreated;
+    public void setSavedTime(Timestamp savedTime) {
+        this.savedTime = savedTime;
+        setChanged();
+        notifyObservers();
     }
 
-    public String getFirstCreated() {
+    public void setFirstCreated(Timestamp firstCreated) {
+        this.firstCreated = firstCreated;
+        setChanged();
+        notifyObservers();
+    }
+
+    public Timestamp getFirstCreated() {
         return firstCreated;
+    }
+
+    public String getAge() {
+        String age = "No age to calculate";
+        if (this.getSavedTime() != null) {
+            TimeStamp timeStamp = new TimeStamp();
+            Timestamp createdTime = this.getFirstCreated();
+            Long difference = timeStamp.getTimeDifference(createdTime);
+            age = timeStamp.ageCalc(difference);
+        }
+        return age;
     }
 
     @Override
@@ -67,6 +93,7 @@ public class Pet {
                 + "\nPet Type: " + this.getPetType()
                 + "\nPet Colour: " + this.getPetColour()
                 + "\nPet Created (Y:M:D:H:M:S): " + this.getFirstCreated()
-                + "\nPet last saved (Y:M:D:H:M:S): " + this.getSavedTime();
+                + "\nPet last saved (Y:M:D:H:M:S): " + this.getSavedTime()
+                + "\nPet Age: " + this.getAge();
     }
 }

@@ -5,9 +5,9 @@
 package Assignment02;
 
 //extends Pet for status values
+import java.sql.Timestamp;
 
-
-public class PetStatus {
+public class PetStatus extends Pet {
 
     private int hunger;
     private int tiredness;
@@ -15,12 +15,21 @@ public class PetStatus {
     private int hygiene;
     private int illness;
 
-    public PetStatus(int hunger, int tiredness, int boredness, int hygiene, int illness) {
+    public PetStatus(String petType, String petColour, String petName, Timestamp savedTime, Timestamp firstCreated, int hunger, int tiredness, int boredness, int hygiene, int illness) {
+        super(petType, petColour, petName, savedTime, firstCreated);
         this.hunger = hunger;
         this.tiredness = tiredness;
         this.boredness = boredness;
         this.hygiene = hygiene;
         this.illness = illness;
+    }
+
+    public void setStatus(int hunger, int tiredness, int boredness, int hygiene, int illness) {
+        setHunger(getHunger() + hunger);
+        setTired(getTired() + tiredness);
+        setBored(getBored() + boredness);
+        setHygiene(getHygiene() + hygiene);
+        setIllness(getIllness() + illness);
     }
 
     public void setHunger(int hunger) {
@@ -105,7 +114,7 @@ public class PetStatus {
 
     @Override
     public String toString() {
-        return "\nHunger: " + this.hunger
+        return super.toString() + "\nHunger: " + this.hunger
                 + "\nTiredness: " + this.tiredness
                 + "\nBoredness: " + this.boredness
                 + "\nHygiene: " + this.hygiene
