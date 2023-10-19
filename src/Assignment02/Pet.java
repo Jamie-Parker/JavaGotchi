@@ -8,6 +8,8 @@ import java.util.Observable;
 import java.sql.Timestamp;
 
 //Pet Object that holds Pet Details
+//Model
+//Notify Observers when status changes
 public class Pet extends Observable {
 
     public String petType;
@@ -23,7 +25,6 @@ public class Pet extends Observable {
         this.petName = petName;
         this.savedTime = savedTime;
         this.firstCreated = firstCreated;
-
     }
 
     public String getPetType() {

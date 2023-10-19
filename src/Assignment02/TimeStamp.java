@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+
 import java.sql.Timestamp;
 
 public class TimeStamp {
@@ -24,21 +25,23 @@ public class TimeStamp {
         return minutesDifference;
     }
 
+    public double timePassed(Timestamp savedTime) {
+        TimeStamp timeStamp = new TimeStamp();
+        Long minutes = timeStamp.getTimeDifference(savedTime);
+        double hours = minutes / 60;
+        return hours;
+    }
+
     public static String ageCalc(long minutes) {//Uses minutes difference to determine total age since first created - Doesnt include seconds
-
         StringBuilder age = new StringBuilder();
-
         if (minutes < 60) {//If created and checked within a minute
             age.append("New Born Baby!");
         } else {
-
             int minutesPerDay = 24 * 60;
             int minutesPerYear = 365 * minutesPerDay;
             int minutesPerMonth = 30 * minutesPerDay;
             int minutesPerHour = 60;
-
             Map<String, Long> ageMap = new HashMap<>();//Hashmap saves string and value 
-
             ageMap.put("years", minutes / minutesPerYear);
             minutes %= minutesPerYear;
             ageMap.put("months", minutes / minutesPerMonth);
@@ -48,9 +51,7 @@ public class TimeStamp {
             ageMap.put("hours", minutes / minutesPerHour);
             minutes %= minutesPerHour;
             ageMap.put("minutes", minutes);
-
             String[] timeUnits = {"years", "months", "days", "hours", "minutes"};
-
             for (String unit : timeUnits) {//Appends age string if value has met above 0 limit 
                 long value = ageMap.get(unit);
                 if (value > 0) {
@@ -67,7 +68,6 @@ public class TimeStamp {
             }
             age.append(" old");
         }
-
         return age.toString();
     }
 }

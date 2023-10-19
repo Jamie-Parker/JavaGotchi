@@ -3,7 +3,6 @@
 *20101511
  */
 package Assignment02;
-
 // Used to handle database connection and throughput
 import java.sql.Timestamp;
 import java.sql.Connection;
@@ -27,6 +26,13 @@ public class Database {
     public static String dbusername = "root";
     public static String dbpassword = "root";
     public static String tablename = "PETINFO";
+    public boolean freshStart = false;
+    public boolean slot1 = false;
+    public boolean slot2 = false;
+    public boolean slot3 = false;
+    public String animal1;
+    public String animal2;
+    public String animal3;
 
     public Database() throws Throwable {
         try {
@@ -39,11 +45,9 @@ public class Database {
     private boolean databaseExist(String url) {
         try {
             DriverManager.getConnection(url);
-            System.out.println("Database Exists");
-            return true; // The database exists
+            return true;
         } catch (SQLException e) {
-            System.out.println("Database Does not Exist");
-            return false; // The database doesn't exist
+            return false;
         }
     }
 
@@ -53,18 +57,12 @@ public class Database {
                 url = url + ";create=true"; // Add create=true if the database doesn't exist
             }
             conn = DriverManager.getConnection(url, dbusername, dbpassword);
-            System.out.println(conn);
-            System.out.println(url + " Connected...");
             if (!checkTableExisting(conn, tablename)) {
                 createTable(conn, tablename);
-
             }
-
             isTableEmpty(conn, tablename);
-
         } catch (Throwable e) {
             e.printStackTrace();
-            System.err.println("Database setup error: " + e.getMessage());
         }
     }
 
@@ -89,9 +87,6 @@ public class Database {
             if (conn != null) {
                 String[] types = {"TABLE"};
                 boolean tableExists = conn.getMetaData().getTables(null, null, tablename, types).next();
-                if (tableExists) {
-                    System.out.println("Table exists");
-                }
                 return tableExists;
             }
         } catch (SQLException e) {
@@ -109,12 +104,10 @@ public class Database {
                 System.out.println(e.getMessage());
             }
         }
-        System.out.println("Database Closed");
     }
 
     public void insertData(int petID, Map<String, Object> petData, Connection conn) throws SQLException {
         String insertQuery = "INSERT INTO " + tablename + " (ID, TYPE, COLOUR, NAME, CREATED, SAVED, HUNGER, TIRED, BORED, HYGIENE, ILL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
         try ( PreparedStatement statement = conn.prepareStatement(insertQuery)) {
             statement.setInt(1, petID);
             statement.setString(2, (String) petData.get("TYPE"));
@@ -128,9 +121,7 @@ public class Database {
             statement.setInt(10, (int) petData.get("HYGIENE"));
             statement.setInt(11, (int) petData.get("ILL"));
             statement.executeUpdate();
-            System.out.println("Data inserted successfully.");
         } catch (SQLException e) {
-
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
@@ -156,35 +147,118 @@ public class Database {
                         petData.put("BORED", 0);
                         petData.put("HYGIENE", 0);
                         petData.put("ILL", 0);
-
                         insertData(i, petData, conn);
-                        System.out.println("Pet " + i + " Populated");
+                        freshStart = true;
                     }
+                } else {
+                    freshStart = false;
                 }
             }
         }
     }
 
+    public void checkTable() throws SQLException {
+        try ( Statement statement = conn.createStatement();  ResultSet resultSet = statement.executeQuery("SELECT TYPE FROM " + tablename)) {
+            slot1 = false;
+            slot2 = false;
+            slot3 = false;
+            int row = 1;
+            while (resultSet.next()) {
+                String petType = resultSet.getString("TYPE");
+                switch (petType) {
+                    case "Type":
+                        if (row == 1) {
+                            slot1 = true;
+                            animal1 = "Type";
+                        } else if (row == 2) {
+                            slot2 = true;
+                            animal2 = "Type";
+                        } else if (row == 3) {
+                            slot3 = true;
+                            animal3 = "Type";
+                        }
+                        break;
+                    case "Dog":
+                        if (row == 1) {
+                            animal1 = "Dog";
+                        } else if (row == 2) {
+                            animal2 = "Dog";
+                        } else if (row == 3) {
+                            animal3 = "Dog";
+                        }
+                        break;
+                    case "Cat":
+                        if (row == 1) {
+                            animal1 = "Cat";
+                        } else if (row == 2) {
+                            animal2 = "Cat";
+                        } else if (row == 3) {
+                            animal3 = "Cat";
+                        }
+                        break;
+                    case "Rabbit":
+                        if (row == 1) {
+                            animal1 = "Rabbit";
+                        } else if (row == 2) {
+                            animal2 = "Rabbit";
+                        } else if (row == 3) {
+                            animal3 = "Rabbit";
+                        }
+                        break;
+                    case "Mouse":
+                        if (row == 1) {
+                            animal1 = "Mouse";
+                        } else if (row == 2) {
+                            animal2 = "Mouse";
+                        } else if (row == 3) {
+                            animal3 = "Mouse";
+                        }
+                        break;
+                }
+                row++;
+            }
+        }
+    }
+
+    public boolean getSlot1() {
+        return this.slot1;
+    }
+
+    public boolean getSlot2() {
+        return this.slot2;
+    }
+
+    public boolean getSlot3() {
+        return this.slot3;
+    }
+
+    public boolean getFreshStart() {
+        return this.freshStart;
+    }
+
+    public String getAnimal1() {
+        return animal1;
+    }
+
+    public String getAnimal2() {
+        return animal2;
+    }
+
+    public String getAnimal3() {
+        return animal3;
+    }
+
     public void updateData(int petID, Map<String, Object> updates) throws SQLException {
-        System.out.println(conn);
         try ( Connection connection = conn) {
             for (Map.Entry<String, Object> entry : updates.entrySet()) {
                 String columnName = entry.getKey();
                 Object columnValue = entry.getValue();
-
-                System.out.println("Column Name: " + columnName);
-                System.out.println("Column Value: " + columnValue);
-
                 String updateQuery = null;
-
                 if (columnValue instanceof String || columnValue instanceof Integer) {
                     updateQuery = "UPDATE " + tablename + " SET " + columnName + " = ? WHERE ID = " + petID;
                 } else if (columnValue instanceof Timestamp) {
                     updateQuery = "UPDATE " + tablename + " SET " + columnName + " = ? WHERE ID = " + petID;
                 }
-
-                System.out.println("Update Query: " + updateQuery);
-
                 if (updateQuery != null) {
                     try ( PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
                         if (columnValue instanceof String) {
@@ -194,14 +268,10 @@ public class Database {
                         } else if (columnValue instanceof Timestamp) {
                             preparedStatement.setTimestamp(1, (Timestamp) columnValue);
                         }
-
                         preparedStatement.executeUpdate();
-                        System.out.println("Update successful for column: " + columnName);
                     } catch (SQLException e) {
                         System.err.println("Error updating column " + columnName + ": " + e.getMessage());
                     }
-                } else {
-                    System.out.println("Update Query is null. Skipping...");
                 }
             }
         }
@@ -209,7 +279,6 @@ public class Database {
 
     public List<Map<String, Object>> getInfo() throws SQLException {
         openConnection();
-        
         List<Map<String, Object>> petInfoList = new ArrayList<>();
         try {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + tablename);
@@ -227,14 +296,12 @@ public class Database {
                 petInfo.put("BORED", rs.getInt("BORED"));
                 petInfo.put("HYGIENE", rs.getInt("HYGIENE"));
                 petInfo.put("ILL", rs.getInt("ILL"));
-
                 petInfoList.add(petInfo);
-
             }
-            System.out.println(petInfoList);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        closeConnection();
         return petInfoList;
     }
 
