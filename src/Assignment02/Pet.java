@@ -7,17 +7,13 @@ package Assignment02;
 import java.util.Observable;
 import java.sql.Timestamp;
 
-//Pet Object that holds Pet Details
-//Model
-//Notify Observers when status changes
 public class Pet extends Observable {
 
-    public String petType;
-    public String petColour;
-    public String petName;
-    public Timestamp savedTime;
-    public Timestamp firstCreated;
-    public Timestamp timeStamp;
+    private String petType;
+    private String petColour;
+    private String petName;
+    private Timestamp savedTime;
+    private Timestamp firstCreated;
 
     public Pet(String petType, String petColour, String petName, Timestamp savedTime, Timestamp firstCreated) {
         this.petType = petType;

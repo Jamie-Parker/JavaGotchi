@@ -9,6 +9,7 @@ package Assignment02;
 //Mediates between model and view changes to status updates view
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,16 +18,15 @@ public class GameController implements ActionListener {
 
     public GUI gui;
     public PetStatus petStatus;
-    public int state;
     public FileController fileController;
     public String animalPic1;
     public String animalPic2;
     public String animalPic3;
+    public StateMachine stateMachine;
 
     public GameController(GUI gui) throws SQLException, Throwable {
         this.gui = gui;
         this.petStatus = new PetStatus("Type", "Colour", "Name", null, null, 0, 0, 0, 0, 0);
-        state = 0;
         fileController = new FileController();
         ActionListener actionListener = this;
         this.gui.start.addActionListener(actionListener);
@@ -97,269 +97,237 @@ public class GameController implements ActionListener {
         this.petStatus.setIllness(updatedIll);
     }
 
+    public void startGame() {
+        if (fileController.freshStart()) {
+            gui.load.setEnabled(false);
+        }
+        gui.backButton.setEnabled(false);
+        gui.optionScreen();
+        stateMachine.setState(1);
+    }
+
+    public void loadGame() {
+        try {
+            gui.backButton.setEnabled(true);
+            fileController.checkTable();
+            gui.getAnimalPic(fileController.getAnimal1(), fileController.getAnimal2(), fileController.getAnimal3());
+            gui.loadButtons();
+            gui.petActionsScreen(-5, -5, -5, -5, -5);
+
+            gui.loadSlot1.setEnabled(!fileController.slot1());
+            gui.loadSlot2.setEnabled(!fileController.slot2());
+            gui.loadSlot3.setEnabled(!fileController.slot3());
+
+            gui.loadScreen();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        stateMachine.setState(2);
+    }
+
+    public void loadPetFromSlot(int slot) {
+        try {
+            this.petStatus = fileController.loadPetInfo(slot);
+            updateStatus();
+            gui.backButton.setEnabled(false);
+            gui.petStatusScreen(this.petStatus);
+        } catch (SQLException ex) {
+            Logger.getLogger(GameController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void createPet() {
+        gui.backButton.setEnabled(true);
+        petStatus = new PetStatus("Type", "Colour", "Name", null, null, 0, 0, 0, 0, 0);
+        gui.createAnimalScreen();
+        gui.text.setText("");
+        stateMachine.setState(3);
+    }
+
+    public void selectPetType(String petType) {
+        this.petStatus.setPetType(petType);
+        gui.createColourScreen();
+        stateMachine.setState(4);
+    }
+
+    public void selectPetColour(String petColour) {
+        this.petStatus.setPetColour(petColour);
+        gui.createNameScreen();
+        stateMachine.setState(5);
+    }
+
+    public void setPetName(String petName) {
+        this.petStatus.setPetName(petName);
+        stateMachine.setState(6);
+    }
+
+    public void setFirstCreated() {
+        TimeStamp currentTime = new TimeStamp();
+        this.petStatus.setFirstCreated(currentTime.getTimeStamp());
+        gui.petStatusScreen(petStatus);
+    }
+
+    public void actionGame() {
+        gui.petActionsScreen(this.petStatus.getHunger(), this.petStatus.getTired(), this.petStatus.getBored(), this.petStatus.getHygiene(), this.petStatus.getIllness());
+        stateMachine.setState(8);
+    }
+
+    public void setAction(String action) {
+        switch (action) {
+            case "Feed":
+                gui.petActionsScreen(2, -1, 0, -1, -1);
+                this.petStatus.setStatus(2, -1, 0, -1, -1);
+                break;
+            case "Play":
+                gui.petActionsScreen(-1, -1, 2, -1, 0);
+                this.petStatus.setStatus(-1, -1, 2, -1, 0);
+                break;
+            case "Sleep":
+                gui.petActionsScreen(0, 5, 0, -2, 0);
+                this.petStatus.setStatus(0, 5, 0, -2, 0);
+                break;
+            case "Clean":
+                gui.petActionsScreen(0, 0, 0, 3, 0);
+                this.petStatus.setStatus(0, 0, 0, 3, 0);
+                break;
+            case "Heal":
+                gui.petActionsScreen(0, 0, 0, 0, 2);
+                this.petStatus.setStatus(0, 0, 0, 0, 2);
+                break;
+        }
+    }
+
+    public void saveGame() {
+        try {
+            fileController.checkTable();
+        } catch (SQLException ex) {
+            Logger.getLogger(GameController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        gui.getAnimalPic(fileController.getAnimal1(), fileController.getAnimal2(), fileController.getAnimal3());
+        gui.loadButtons();
+        gui.petSaveScreen();
+        stateMachine.setState(9);
+    }
+
+    public void setSavedSlot(int slot) {
+        try {
+            TimeStamp currentTime = new TimeStamp();
+            this.petStatus.setSavedTime(currentTime.getTimeStamp());
+            fileController.savePetInfo(slot, this.petStatus.getPetType(), this.petStatus.getPetColour(), this.petStatus.getPetName(),
+                    this.petStatus.getFirstCreated(), this.petStatus.getSavedTime(), this.petStatus.getHunger(), this.petStatus.getTired(),
+                    this.petStatus.getBored(), this.petStatus.getHygiene(), this.petStatus.getIllness());
+            gui.backButton.setEnabled(false);
+            gui.petStatusScreen(this.petStatus);
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public void optionsGame() {
+        if (fileController.freshStart()) {
+            gui.load.setEnabled(true);
+        }
+        gui.petActionsScreen(-5, -5, -5, -5, -5);
+        gui.backButton.setEnabled(true);
+        gui.optionScreen();
+        stateMachine.setState(1);
+    }
+
+    public void goBackToStatus() {
+        gui.backButton.setEnabled(false);
+        gui.petStatusScreen(this.petStatus);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == gui.start) {
-            if (fileController.freshStart()) {
-                gui.load.setEnabled(false);
-            }
-            gui.backButton.setEnabled(false);
-            gui.optionScreen();
-            state = 1;
+            startGame();
         } else if (e.getSource() == gui.load) {
-            try {
-                gui.backButton.setEnabled(true);
-                fileController.checkTable();
-                gui.getAnimalPic(fileController.getAnimal1(), fileController.getAnimal2(), fileController.getAnimal3());
-                gui.loadButtons();
-                gui.petActionsScreen(-5, -5, -5, -5, -5);
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-            if (fileController.slot1()) {
-                gui.loadSlot1.setEnabled(false);
-            } else {
-                gui.loadSlot1.setEnabled(true);
-            }
-
-            if (fileController.slot2()) {
-                gui.loadSlot2.setEnabled(false);
-            } else {
-                gui.loadSlot2.setEnabled(true);
-            }
-
-            if (fileController.slot3()) {
-                gui.loadSlot3.setEnabled(false);
-            } else {
-                gui.loadSlot3.setEnabled(true);
-            }
-            gui.loadScreen();
-            state = 2;
+            loadGame();
         } else if (e.getSource() == gui.create) {
-            gui.backButton.setEnabled(true);
-            petStatus = new PetStatus("Type", "Colour", "Name", null, null, 0, 0, 0, 0, 0);
-            gui.createAnimalScreen();
-            gui.text.setText("");
-            state = 3;
+            createPet();
         } else if (e.getSource() == gui.loadSlot1) {
-            try {
-                this.petStatus = fileController.loadPetInfo(1);
-                updateStatus();
-                gui.backButton.setEnabled(false);
-                gui.petStatusScreen(this.petStatus);
-            } catch (SQLException ex) {
-                Logger.getLogger(GameController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            loadPetFromSlot(1);
         } else if (e.getSource() == gui.loadSlot2) {
-            try {
-                this.petStatus = fileController.loadPetInfo(2);
-                updateStatus();
-                gui.backButton.setEnabled(false);
-                gui.petStatusScreen(this.petStatus);
-            } catch (SQLException ex) {
-                Logger.getLogger(GameController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            loadPetFromSlot(2);
         } else if (e.getSource() == gui.loadSlot3) {
-            try {
-                this.petStatus = fileController.loadPetInfo(3);
-                updateStatus();
-                gui.backButton.setEnabled(false);
-                gui.petStatusScreen(this.petStatus);
-            } catch (SQLException ex) {
-                Logger.getLogger(GameController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            loadPetFromSlot(3);
         } else if (e.getSource() == gui.createDog) {
-            this.petStatus.setPetType("Dog");
-            state = 4;
-            gui.createColourScreen();
+            selectPetType("Dog");
         } else if (e.getSource() == gui.createCat) {
-            this.petStatus.setPetType("Cat");
-            state = 4;
-            gui.createColourScreen();
+            selectPetType("Cat");
         } else if (e.getSource() == gui.createRabbit) {
-            this.petStatus.setPetType("Rabbit");
-            state = 4;
-            gui.createColourScreen();
+            selectPetType("Rabbit");
         } else if (e.getSource() == gui.createMouse) {
-            this.petStatus.setPetType("Mouse");
-            state = 4;
-            gui.createColourScreen();
+            selectPetType("Mouse");
         } else if (e.getSource() == gui.black) {
-            this.petStatus.setPetColour("Black");
-            state = 5;
-            gui.createNameScreen();
+            selectPetColour("Black");
         } else if (e.getSource() == gui.white) {
-            this.petStatus.setPetColour("White");
-            state = 5;
-            gui.createNameScreen();
+            selectPetColour("White");
         } else if (e.getSource() == gui.grey) {
-            this.petStatus.setPetColour("Grey");
-            state = 5;
-            gui.createNameScreen();
+            selectPetColour("Grey");
         } else if (e.getSource() == gui.brown) {
-            this.petStatus.setPetColour("Brown");
-            state = 5;
-            gui.createNameScreen();
+            selectPetColour("Brown");
         } else if (e.getSource() == gui.text) {
-            this.petStatus.setPetName(gui.text.getText());
-            state = 6;
-            TimeStamp currentTime = new TimeStamp();
-            this.petStatus.setFirstCreated(currentTime.getTimeStamp());
-            state = 7;
-            gui.backButton.setEnabled(false);
-            gui.petStatusScreen(this.petStatus);
+            setPetName(gui.text.getText());
+            setFirstCreated();
         } else if (e.getSource() == gui.action) {
-            state = 8;
-            gui.backButton.setEnabled(true);
-            gui.petActionsScreen(this.petStatus.getHunger(), this.petStatus.getTired(), this.petStatus.getBored(), this.petStatus.getHygiene(), this.petStatus.getIllness());
-        } else if (e.getSource()== gui.feed) {
-            gui.petActionsScreen(2, -1, 0, -1, -1);
-            this.petStatus.setStatus(2, -1, 0, -1, -1);
-        } else if (e.getSource()== gui.sleep) {
-            gui.petActionsScreen(0, 5, 0, -2, 0);
-            this.petStatus.setStatus(0, 5, 0, -2, 0);
-        } else if (e.getSource()== gui.play) {
-            gui.petActionsScreen(-1, -1, 2, -1, 0);
-            this.petStatus.setStatus(-1, -1, 2, -1, 0);
+            actionGame();
+        } else if (e.getSource() == gui.feed) {
+            setAction("Feed");
+        } else if (e.getSource() == gui.sleep) {
+            setAction("Sleep");
+        } else if (e.getSource() == gui.play) {
+            setAction("Play");
         } else if (e.getSource() == gui.clean) {
-            gui.petActionsScreen(0, 0, 0, 3, 0);
-            this.petStatus.setStatus(0, 0, 0, 3, 0);
-        } else if (e.getSource()== gui.heal) {
-            gui.petActionsScreen(0, 0, 0, 0, 2);
-            this.petStatus.setStatus(0, 0, 0, 0, 2);
-        } else if (e.getSource()== gui.save) {
-            state = 9;
-            try {
-                fileController.checkTable();
-            } catch (SQLException ex) {
-                Logger.getLogger(GameController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            gui.getAnimalPic(fileController.getAnimal1(), fileController.getAnimal2(), fileController.getAnimal3());
-            gui.loadButtons();
-            gui.petSaveScreen();
-        } else if (e.getSource()== gui.saveSlot1) {
-            state = 8;
-            try {
-                TimeStamp currentTime = new TimeStamp();
-                this.petStatus.setSavedTime(currentTime.getTimeStamp());
-                fileController.savePetInfo(1, this.petStatus.getPetType(), this.petStatus.getPetColour(), this.petStatus.getPetName(),
-                        this.petStatus.getFirstCreated(), this.petStatus.getSavedTime(), this.petStatus.getHunger(), this.petStatus.getTired(),
-                        this.petStatus.getBored(), this.petStatus.getHygiene(), this.petStatus.getIllness());
-                gui.backButton.setEnabled(false);
-                gui.petStatusScreen(this.petStatus);
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
+            setAction("Clean");
+        } else if (e.getSource() == gui.heal) {
+            setAction("Heal");
+        } else if (e.getSource() == gui.save) {
+            saveGame();
+        } else if (e.getSource() == gui.saveSlot1) {
+            setSavedSlot(1);
         } else if (e.getSource() == gui.saveSlot2) {
-            state = 8;
-            try {
-                TimeStamp currentTime = new TimeStamp();
-                this.petStatus.setSavedTime(currentTime.getTimeStamp());
-                fileController.savePetInfo(2, this.petStatus.getPetType(), this.petStatus.getPetColour(), this.petStatus.getPetName(),
-                        this.petStatus.getFirstCreated(), this.petStatus.getSavedTime(), this.petStatus.getHunger(), this.petStatus.getTired(),
-                        this.petStatus.getBored(), this.petStatus.getHygiene(), this.petStatus.getIllness());
-                gui.backButton.setEnabled(false);
-                gui.petStatusScreen(this.petStatus);
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        } else if (e.getSource()== gui.saveSlot3) {
-            state = 8;
-            try {
-                TimeStamp currentTime = new TimeStamp();
-                this.petStatus.setSavedTime(currentTime.getTimeStamp());
-                fileController.savePetInfo(3, this.petStatus.getPetType(), this.petStatus.getPetColour(), this.petStatus.getPetName(),
-                        this.petStatus.getFirstCreated(), this.petStatus.getSavedTime(), this.petStatus.getHunger(), this.petStatus.getTired(),
-                        this.petStatus.getBored(), this.petStatus.getHygiene(), this.petStatus.getIllness());
-                gui.backButton.setEnabled(false);
-                gui.petStatusScreen(this.petStatus);
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        } else if (e.getSource()== gui.options) {
-            if (fileController.freshStart()) {
-                gui.load.setEnabled(true);
-            }
-            gui.petActionsScreen(-5, -5, -5, -5, -5);
-            gui.backButton.setEnabled(true);
-            gui.optionScreen();
-            state = 10;
+            setSavedSlot(2);
+        } else if (e.getSource() == gui.saveSlot3) {
+            setSavedSlot(3);
+        } else if (e.getSource() == gui.options) {
+            optionsGame();
         } else if (e.getSource() == gui.backButton) {
-            switch (state) {
-                case 2://Load
-                    gui.backButton.setEnabled(false);
-                    gui.optionScreen();
-                    state = 1;
-                    break;
-                case 3://Create
-                    gui.backButton.setEnabled(false);
-                    gui.optionScreen();
-                    state = 1;
-                    break;
-                case 4://Type
-                    gui.createAnimalScreen();
-                    state -= 1;
-                    break;
-                case 5://Colour
-                    gui.createColourScreen();
-                    state -= 1;
-                    break;
-                case 6://Name
-                    gui.createNameScreen();
-                    state -= 1;
-                    break;
-                case 7://Status
-                    gui.backButton.setEnabled(false);
-                    gui.petStatusScreen(this.petStatus);
-                    break;
-                case 8://Actions
-                    gui.backButton.setEnabled(false);
-                    gui.petStatusScreen(this.petStatus);
-                    state = 7;
-                    break;
-                case 9://Save
-                    gui.petActionsScreen(this.petStatus.getHunger(), this.petStatus.getTired(), this.petStatus.getBored(), this.petStatus.getHygiene(), this.petStatus.getIllness());
-                    state -= 1;
-                    break;
-                case 10://Options - Redo
-                    gui.backButton.setEnabled(false);
-                    gui.petStatusScreen(this.petStatus);
-                    state = 7;
-                    break;
-            }
+            stateMachine.handleBackButton();
+        }
 
-            if (this.petStatus.getHunger() == 5) {
-                gui.feed.setEnabled(false);
-            } else {
-                gui.feed.setEnabled(true);
-            }
+        if (this.petStatus.getHunger() == 5) {
+            gui.feed.setEnabled(false);
+        } else {
+            gui.feed.setEnabled(true);
+        }
 
-            if (this.petStatus.getTired() == 5) {
-                gui.sleep.setEnabled(false);
-            } else {
-                gui.sleep.setEnabled(true);
-            }
+        if (this.petStatus.getTired() == 5) {
+            gui.sleep.setEnabled(false);
+        } else {
+            gui.sleep.setEnabled(true);
+        }
 
-            if (this.petStatus.getBored() == 5) {
-                gui.play.setEnabled(false);
-            } else {
-                gui.play.setEnabled(true);
-            }
+        if (this.petStatus.getBored() == 5) {
+            gui.play.setEnabled(false);
+        } else {
+            gui.play.setEnabled(true);
+        }
 
-            if (this.petStatus.getHygiene() == 5) {
-                gui.clean.setEnabled(false);
-            } else {
-                gui.clean.setEnabled(true);
-            }
+        if (this.petStatus.getHygiene() == 5) {
+            gui.clean.setEnabled(false);
+        } else {
+            gui.clean.setEnabled(true);
+        }
 
-            if (this.petStatus.getIllness() == 5) {
-                gui.heal.setEnabled(false);
-            } else {
-                gui.heal.setEnabled(true);
-            }
+        if (this.petStatus.getIllness() == 5) {
+            gui.heal.setEnabled(false);
+        } else {
+            gui.heal.setEnabled(true);
         }
     }
-    
+
     public static void main(String[] args) throws SQLException, Throwable {
         GUI gui = new GUI();
         GameController gameController = new GameController(gui);
