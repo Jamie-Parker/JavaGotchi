@@ -1,6 +1,7 @@
 /*
 *Jamie Parker
 *20101511
+*StateMachine is used to handle states so that a back button can be effectively used in the program
  */
 package Assignment02;
 
@@ -10,14 +11,14 @@ public class StateMachine {
     private GUI gui;
     private GameController gameController;
 
-    public StateMachine(GUI gui) {
+    public StateMachine(GUI gui, GameController gameController) {
         this.gui = gui;
         this.gameController = gameController;
         currentState = 0;
     }
 
     public void setState(int newState) {
-        currentState = newState;
+        this.currentState = newState;
     }
 
     public int getCurrentState() {
@@ -26,43 +27,40 @@ public class StateMachine {
 
     public void handleBackButton() {
         switch (currentState) {
-            case 2:
-                gui.backButton.setEnabled(false);//
-                gameController.optionsGame();
+            case 1://Home Screen - Uncreachable
+                gui.backButton.setEnabled(false);
+                break;
+            case 2://Options Screen - From Create or Load
                 setState(1);
-                break;
-            case 3:
-                gui.backButton.setEnabled(false);//
                 gameController.optionsGame();
-                setState(2);
+                gui.backButton.setEnabled(false);
                 break;
-            case 4:
+            case 3://Creation Menu - From Type
+                setState(1);
                 gameController.createPet();
-                gameController.selectPetType("");
+                break;
+            case 4://Creation Menu - From Colour
                 setState(3);
+                gameController.selectPetType("");
                 break;
-            case 5:
-                gameController.selectPetColour("");
+            case 5://Creation Menu - From Name
                 setState(4);
+                gameController.selectPetColour("");
                 break;
-            case 6:
-                gameController.setPetName("");
-                setState(5);
-                break;
-            case 7:
+            case 6://Status Screen
                 gameController.goBackToStatus();
                 break;
-            case 8:
+            case 7://Status Screen - From Saved
+                setState(6);
                 gameController.goBackToStatus();
+                break;
+            case 8://Action Screen
                 setState(7);
-                break;
-            case 9:
                 gameController.actionGame();
-                setState(8);
                 break;
-            case 10:
+            case 9://Status Screen - From Option Menu - Loop after Loaded or Created Pet
+                setState(8);
                 gameController.goBackToStatus();
-                setState(7);
                 break;
         }
     }

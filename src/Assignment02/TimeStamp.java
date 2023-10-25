@@ -1,10 +1,10 @@
 /*
 *Jamie Parker
 *20101511
+*TimeStamp is used for time related functions such as getting a current time stamp and calculating passage of time
  */
 package Assignment02;
 
-//Gets Current Time / Calculates difference between First Created time and Current Time / Calculates Age
 import java.time.LocalDateTime;
 import java.time.Duration;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class TimeStamp {
         return minutesDifference;
     }
 
-    public double timePassed(Timestamp savedTime) {
+    public double timePassed(Timestamp savedTime) {//used for Event class to determine amount of status reduction
         TimeStamp timeStamp = new TimeStamp();
         Long minutes = timeStamp.getTimeDifference(savedTime);
         double hours = minutes / 60;
@@ -34,7 +34,7 @@ public class TimeStamp {
 
     public static String ageCalc(long minutes) {//Uses minutes difference to determine total age since first created - Doesnt include seconds
         StringBuilder age = new StringBuilder();
-        if (minutes < 60) {//If created and checked within a minute
+        if (minutes < 1) {//If created and checked within a minute
             age.append("New Born Baby!");
         } else {
             int minutesPerDay = 24 * 60;

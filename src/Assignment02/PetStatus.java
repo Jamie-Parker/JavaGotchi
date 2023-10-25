@@ -1,12 +1,12 @@
 /*
 *Jamie Parker
 *20101511
- */
+*PetStatus is an extension of pet that provides variables for the status of the object
+*Setters ensure that int values stay within bounds 0 to 5
+*
+*/
 package Assignment02;
 
-//extends Pet for status values
-//Model
-//Notify observers when status changes
 import java.sql.Timestamp;
 
 public class PetStatus extends Pet {
@@ -23,6 +23,8 @@ public class PetStatus extends Pet {
         this.boredness = boredness;
         this.hygiene = hygiene;
         this.illness = illness;
+        setChanged();
+        notifyObservers(this);
     }
 
     public void setStatus(int hunger, int tiredness, int boredness, int hygiene, int illness) {
@@ -32,7 +34,7 @@ public class PetStatus extends Pet {
         setHygiene(getHygiene() + hygiene);
         setIllness(getIllness() + illness);
         setChanged();
-        notifyObservers();
+        notifyObservers(this);
     }
 
     public void setHunger(int hunger) {
@@ -45,7 +47,7 @@ public class PetStatus extends Pet {
         }
         this.hunger = hunger;
         setChanged();
-        notifyObservers();
+        notifyObservers(hunger);
     }
 
     public int getHunger() {
@@ -62,7 +64,7 @@ public class PetStatus extends Pet {
         }
         this.tiredness = tiredness;
         setChanged();
-        notifyObservers();
+        notifyObservers(tiredness);
     }
 
     public int getTired() {
@@ -79,7 +81,7 @@ public class PetStatus extends Pet {
         }
         this.boredness = boredness;
         setChanged();
-        notifyObservers();
+        notifyObservers(boredness);
     }
 
     public int getBored() {
@@ -96,7 +98,7 @@ public class PetStatus extends Pet {
         }
         this.hygiene = hygiene;
         setChanged();
-        notifyObservers();
+        notifyObservers(hygiene);
     }
 
     public int getHygiene() {
@@ -113,7 +115,7 @@ public class PetStatus extends Pet {
         }
         this.illness = illness;
         setChanged();
-        notifyObservers();
+        notifyObservers(illness);
     }
 
     public int getIllness() {

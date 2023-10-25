@@ -1,16 +1,18 @@
 /*
 *Jamie Parker
 *20101511
+*FileController is the controller interface between the database and the GameController
+*Used to load and save pet obejcts
  */
 package Assignment02;
-//Handles loading and saving from GameManager to Database and back
-//Controller
-//Mediates between model and view changes to status updates view
+
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FileController {
 
@@ -18,12 +20,12 @@ public class FileController {
     private final Database database;
     private boolean fresh = false;
 
-    public FileController() throws SQLException, Throwable {
+    public FileController(){
         database = new Database();
     }
 
-    public PetStatus loadPetInfo(int petID) throws SQLException {
-        database.openConnection();
+    public PetStatus loadPetInfo(int petID) {
+        database.openConnection(); //Gets pet info from the table and loads it into a petStatus obejct
         List<Map<String, Object>> petInfoList = database.getInfo();
         for (Map<String, Object> petInfo : petInfoList) {
             int id = (int) petInfo.get("ID");
@@ -66,44 +68,18 @@ public class FileController {
         return fresh;
     }
 
-    public boolean slot1() {
-        boolean slot1 = database.getSlot1();
-        return slot1;
+    public String getAnimalType(int slot) {
+        return database.getAnimalType(slot);
     }
 
-    public boolean slot2() {
-        boolean slot2 = database.getSlot2();
-        return slot2;
-    }
-
-    public boolean slot3() {
-        boolean slot3 = database.getSlot3();
-        return slot3;
-    }
-
-    public String getAnimal1() {
-        String animal1 = database.getAnimal1();
-        return animal1;
-    }
-
-    public String getAnimal2() {
-        String animal2 = database.getAnimal2();
-        return animal2;
-    }
-
-    public String getAnimal3() {
-        String animal3 = database.getAnimal3();
-        return animal3;
-    }
-
-    public void checkTable() throws SQLException {
+    public void checkTable() {
         database.openConnection();
         database.checkTable();
         database.closeConnection();
     }
 
-    public void savePetInfo(int petID, String petType, String petColour, String petName, Timestamp petCreated, Timestamp petSaved, int petHunger, int petTired, int petBored, int petHygiene, int petIll) throws SQLException {
-        database.openConnection();
+    public void savePetInfo(int petID, String petType, String petColour, String petName, Timestamp petCreated, Timestamp petSaved, int petHunger, int petTired, int petBored, int petHygiene, int petIll){
+        database.openConnection();//Creates a map for table coloumn names and pet object values
         if (petID > 0) {
             Map<String, Object> updates = new LinkedHashMap<>();
             updates.put("ID", petID);
@@ -117,7 +93,11 @@ public class FileController {
             updates.put("BORED", petBored);
             updates.put("HYGIENE", petHygiene);
             updates.put("ILL", petIll);
-            database.updateData(petID, updates);
+            try {
+                database.updateData(petID, updates);
+            } catch (SQLException ex) {
+                Logger.getLogger(FileController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         database.closeConnection();
     }

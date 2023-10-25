@@ -1,6 +1,7 @@
 /*
 *Jamie Parker
 *20101511
+*MyImage maintains stored image content and converts them to usable images
  */
 package Assignment02;
 
@@ -25,27 +26,27 @@ public class MyImage {
         return catPic;
     }
 
-    public java.awt.Image getRab() {
+    public java.awt.Image getRabbit() {
         return rabPic;
     }
 
-    public java.awt.Image getMou() {
+    public java.awt.Image getMouse() {
         return mouPic;
     }
 
-    public java.awt.Image getEmpty() {
+    public java.awt.Image getEmptyHeart() {
         return emptyHeart;
     }
 
-    public java.awt.Image getFull() {
+    public java.awt.Image getFullHeart() {
         return fullHeart;
     }
 
-    public java.awt.Image getHome() {
+    public java.awt.Image getHomeScreen() {
         return homeScreen;
     }
     
-    public java.awt.Image getQuestion(){
+    public java.awt.Image getQuestionMark(){
         return questionMark;
     }
             

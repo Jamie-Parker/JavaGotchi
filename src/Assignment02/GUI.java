@@ -1,13 +1,11 @@
 /*
 *Jamie Parker
 *20101511
- */
+*GUI is the View of the program.
+*Creates the frame and multiple pages to be displayed
+*Provides access to 3 load and save slots for pets stored in the database, pet object information and a pet maintenance page
+*/
 package Assignment02;
-
-//Creates the frames and items for the program
-//View
-//Observers
-//Changes to controller should reflect here
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -24,14 +22,12 @@ import javax.swing.*;
 
 public class GUI extends JFrame implements Observer {
 
+    public PetStatus petStatus;
     private final JFrame frame;
     private final Image dogPic;
     private final Image catPic;
     private final Image rabPic;
     private final Image mouPic;
-    private Image animalPic1;
-    private Image animalPic2;
-    private Image animalPic3;
     private final Image questionMark;
     private final Image emptyHeart;
     private final Image fullHeart;
@@ -66,6 +62,7 @@ public class GUI extends JFrame implements Observer {
     protected JPanel backPanel;
     protected JPanel centerPanel;
     protected JPanel titlePanel;
+    protected JPanel bottomPanel;
     protected JLabel title;
     protected JLabel labelSlot1;
     protected JLabel labelSlot2;
@@ -73,11 +70,18 @@ public class GUI extends JFrame implements Observer {
     protected JPanel slotPanel1;
     protected JPanel slotPanel2;
     protected JPanel slotPanel3;
-    int heart1 = 0;
-    int heart2 = 0;
-    int heart3 = 0;
-    int heart4 = 0;
-    int heart5 = 0;
+    protected JTextArea statusText;
+    protected JTextArea stringText;
+    public String string;
+    public String petType;
+    public String petName;
+    public int hunger;
+    public int tired;
+    public int bored;
+    public int hygiene;
+    public int sick;
+    public int[] previousValues;
+    private Image[] animalPics = new Image[3];
     ImageIcon icon = null;
     MyImage image = new MyImage();
 
@@ -92,11 +96,11 @@ public class GUI extends JFrame implements Observer {
         backButton = new JButton("Back");
         dogPic = image.getDog();
         catPic = image.getCat();
-        rabPic = image.getRab();
-        mouPic = image.getMou();
-        emptyHeart = image.getEmpty();
-        fullHeart = image.getFull();
-        questionMark = image.getQuestion();
+        rabPic = image.getRabbit();
+        mouPic = image.getMouse();
+        emptyHeart = image.getEmptyHeart();
+        fullHeart = image.getFullHeart();
+        questionMark = image.getQuestionMark();
         createDog = new JButton(new ImageIcon(dogPic));
         createCat = new JButton(new ImageIcon(catPic));
         createRabbit = new JButton(new ImageIcon(rabPic));
@@ -129,79 +133,48 @@ public class GUI extends JFrame implements Observer {
         backPanel = new JPanel(new BorderLayout());
         centerPanel = new JPanel(new BorderLayout());
         titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel = new JPanel(new BorderLayout());
+        statusText = new JTextArea();
+        stringText = new JTextArea();
+        string = "";
         title = new JLabel();
         homeScreen();
         frame.setVisible(true);
+        previousValues = new int[5];
     }
 
-    public void loadButtons() {
-        loadSlot1.setIcon(new ImageIcon(animalPic1));
-        loadSlot2.setIcon(new ImageIcon(animalPic2));
-        loadSlot3.setIcon(new ImageIcon(animalPic3));
-        saveSlot1.setIcon(new ImageIcon(animalPic1));
-        saveSlot2.setIcon(new ImageIcon(animalPic2));
-        saveSlot3.setIcon(new ImageIcon(animalPic3));
+    public void loadButtons() {//updates the buttons to the current slot picture
+        loadSlot1.setIcon(new ImageIcon(animalPics[0]));
+        loadSlot2.setIcon(new ImageIcon(animalPics[1]));
+        loadSlot3.setIcon(new ImageIcon(animalPics[2]));
+        saveSlot1.setIcon(new ImageIcon(animalPics[0]));
+        saveSlot2.setIcon(new ImageIcon(animalPics[1]));
+        saveSlot3.setIcon(new ImageIcon(animalPics[2]));
     }
 
-    public void getAnimalPic(String animalPic1, String animalPic2, String animalPic3) {
-        switch (animalPic1) {
+    public void setAnimalImage(int slot, String animalType) {//used to set slot picture as animal type
+        switch (animalType) {
             case "Dog":
-                this.animalPic1 = dogPic;
+                animalPics[slot] = dogPic;
                 break;
             case "Cat":
-                this.animalPic1 = catPic;
+                animalPics[slot] = catPic;
                 break;
             case "Rabbit":
-                this.animalPic1 = rabPic;
+                animalPics[slot] = rabPic;
                 break;
             case "Mouse":
-                this.animalPic1 = mouPic;
+                animalPics[slot] = mouPic;
                 break;
             case "Type":
-                this.animalPic1 = questionMark;
-                break;
-        }
-
-        switch (animalPic2) {
-            case "Dog":
-                this.animalPic2 = dogPic;
-                break;
-            case "Cat":
-                this.animalPic2 = catPic;
-                break;
-            case "Rabbit":
-                this.animalPic2 = rabPic;
-                break;
-            case "Mouse":
-                this.animalPic2 = mouPic;
-                break;
-            case "Type":
-                this.animalPic2 = questionMark;
-                break;
-        }
-
-        switch (animalPic3) {
-            case "Dog":
-                this.animalPic3 = dogPic;
-                break;
-            case "Cat":
-                this.animalPic3 = catPic;
-                break;
-            case "Rabbit":
-                this.animalPic3 = rabPic;
-                break;
-            case "Mouse":
-                this.animalPic3 = mouPic;
-                break;
-            case "Type":
-                this.animalPic3 = questionMark;
+                animalPics[slot] = questionMark;
                 break;
         }
     }
 
-    public void homeScreen() {
+    public void homeScreen() {//Javagotchi homescreen with start button
         clear();
-        homeScreen = image.getHome();
+        homeScreen = image.getHomeScreen();
         JLabel label = new JLabel(new ImageIcon(homeScreen));
         backPanel.add(label);
         start.setPreferredSize(new Dimension(100, 30));
@@ -210,7 +183,7 @@ public class GUI extends JFrame implements Observer {
         set();
     }
 
-    public void optionScreen() {
+    public void optionScreen() {//Pet object initiation menu for either Create or Load
         clear();
         title.setText("Options Menu");
         titlePanel.add(title);
@@ -227,7 +200,7 @@ public class GUI extends JFrame implements Observer {
         set();
     }
 
-    public void loadScreen() {
+    public void loadScreen() {//Load slots with picture type
         clear();
         title.setText("Load Menu");
         titlePanel.add(title);
@@ -246,7 +219,7 @@ public class GUI extends JFrame implements Observer {
         set();
     }
 
-    public void createAnimalScreen() {
+    public void createAnimalScreen() {//Provides Picture filled buttons for type selection
         clear();
         title.setText("Creator Menu: Pet Type");
         titlePanel.add(title);
@@ -260,7 +233,7 @@ public class GUI extends JFrame implements Observer {
         set();
     }
 
-    public void createColourScreen() {
+    public void createColourScreen() {//Creates colour filled buttons for colour selection
         clear();
         title.setText("Creator Menu: Colour");
         titlePanel.add(title);
@@ -270,7 +243,7 @@ public class GUI extends JFrame implements Observer {
         black.setBackground(Color.BLACK);
         white.setBackground(Color.WHITE);
         grey.setBackground(Color.GRAY);
-        Color brownColour = new Color(139, 69, 19);
+        Color brownColour = new Color(139, 69, 19); // BROWN is not a standard
         brown.setBackground(brownColour);
         centerPanel.add(black);
         centerPanel.add(white);
@@ -279,7 +252,7 @@ public class GUI extends JFrame implements Observer {
         set();
     }
 
-    public void createNameScreen() {
+    public void createNameScreen() {//Creates a text box to add a name for pet object
         clear();
         title.setText("Creator Menu: Name");
         titlePanel.add(title);
@@ -297,7 +270,7 @@ public class GUI extends JFrame implements Observer {
         set();
     }
 
-    public void petStatusScreen(Pet pet) {
+    public void petStatusScreen() {//Displays pet picture and toString() with information about pet object
         clear();
         title.setText("Pet Status");
         titlePanel.add(title);
@@ -306,8 +279,7 @@ public class GUI extends JFrame implements Observer {
         titlePanel.add(options);
         backPanel.add(action, BorderLayout.EAST);
         centerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 100));
-        JPanel slotPanel1 = new JPanel();
-        switch (pet.getPetType()) {
+        switch (petType) {//Changes picture according to current pet object type
             case "Dog":
                 icon = new ImageIcon(dogPic);
                 break;
@@ -323,8 +295,6 @@ public class GUI extends JFrame implements Observer {
         }
         JLabel pictureLabel = new JLabel(icon);
         slotPanel1.add(pictureLabel);
-        JTextArea statusText = new JTextArea();
-        statusText.setText(pet.toString());
         statusText.setEditable(false);
         statusText.setWrapStyleWord(true);
         statusText.setLineWrap(true);
@@ -334,7 +304,7 @@ public class GUI extends JFrame implements Observer {
         set();
     }
 
-    public void petActionsScreen(int feedNo, int sleepNo, int playNo, int cleanNo, int healNo) {
+    public void petActionsScreen() {//Pet object maintenance 
         clear();
         title.setText("Pet Actions");
         titlePanel.add(title);
@@ -344,7 +314,7 @@ public class GUI extends JFrame implements Observer {
         centerPanel.setLayout(new GridBagLayout());
         JPanel picturePanel = new JPanel(new BorderLayout());
         JPanel gridPanel = new JPanel(new GridBagLayout());
-        JPanel buttonPanel = new JPanel(new GridLayout(5, 1));
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 1));// GridLayout for button veritcal alignement with GridBag layout
         JLabel pictureLabel = new JLabel(icon);
         picturePanel.add(pictureLabel, BorderLayout.CENTER);
         buttonPanel.add(feed);
@@ -352,11 +322,11 @@ public class GUI extends JFrame implements Observer {
         buttonPanel.add(play);
         buttonPanel.add(clean);
         buttonPanel.add(heal);
-        GridBagConstraints gbc = new GridBagConstraints();
+        GridBagConstraints gbc = new GridBagConstraints();//Uses GridBag to maintain a grid of 5x5 Heart icons
         gbc.insets = new Insets(5, 5, 5, 5);
         JLabel[][] heartLabels = new JLabel[5][5];
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++) {//Initialises all the hearts icons to empty hearts - fills the grid with icons
             for (int j = 0; j < 5; j++) {
                 heartLabels[i][j] = new JLabel(new ImageIcon(emptyHeart));
                 gbc.gridx = j;
@@ -365,90 +335,53 @@ public class GUI extends JFrame implements Observer {
             }
         }
 
-        for (int i = 0; i < 5; i++) {
-            heartLabels[3][i].setIcon(new ImageIcon(emptyHeart));
-        }
-        
-        if (cleanNo == -5) {
-            for (int i = 0; i < 5; i++) {
-                heartLabels[3][i].setIcon(new ImageIcon(emptyHeart));
+        int[] values = {hunger, tired, bored, hygiene, sick};//creates and array of status values
+        int[] attributeIndexes = {0, 1, 2, 3, 4};
+        String[] attributeNames = {"Full", "Not Tired", "Content", "Clean", "Not Sick"};
+        String reachedAttribute = "";
+
+        for (int i = 0; i < 5; i++) {//Changes String and Heart Icon for status values
+            int value = values[i];
+            int previousValue = previousValues[i];
+            int attributeIndex = attributeIndexes[i];
+            value = Math.min(5, Math.max(0, value));
+
+            for (int j = 0; j < value; j++) {//Changes heart icon determined by status value
+                heartLabels[attributeIndex][j].setIcon(new ImageIcon(fullHeart));
+            }
+            if (value == 5 && previousValue < 5) {
+                reachedAttribute = attributeNames[i];
+            }
+            previousValues[i] = value;
+            if (!reachedAttribute.isEmpty()) {//Changes the text string output to indicate when a value max has been reached for each status attribute
+                string = petName + " is " + reachedAttribute + "!";
+            } else {
+                string = "";
             }
         }
 
-        if (cleanNo > 0) {
-            for (int i = 0; i < Math.min(5, cleanNo); i++) {
-                heartLabels[3][i].setIcon(new ImageIcon(fullHeart));
-            }
-        }
-
-        heart1 += feedNo;
-        if (heart1 < 0) {
-            heart1 = 0;
-        }
-        if (heart1 > 5) {
-            heart1 = 5;
-        }
-        for (int i = 0; i < heart1; i++) {
-            heartLabels[0][i].setIcon(new ImageIcon(fullHeart));
-        }
-
-        heart2 += sleepNo;
-        if (heart2 < 0) {
-            heart2 = 0;
-        }
-        if (heart2 > 5) {
-            heart2 = 5;
-        }
-        for (int i = 0; i < heart2; i++) {
-            heartLabels[1][i].setIcon(new ImageIcon(fullHeart));
-        }
-
-        heart3 += playNo;
-        if (heart3 < 0) {
-            heart3 = 0;
-        }
-        if (heart3 > 5) {
-            heart3 = 5;
-        }
-        for (int i = 0; i < heart3; i++) {
-            heartLabels[2][i].setIcon(new ImageIcon(fullHeart));
-        }
-
-        heart4 += cleanNo;
-        if (heart4 < 0) {
-            heart4 = 0;
-        }
-        if (heart4 > 5) {
-            heart4 = 5;
-        }
-        for (int i = 0; i < heart4; i++) {
-            heartLabels[3][i].setIcon(new ImageIcon(fullHeart));
-        }
-
-        heart5 += healNo;
-        if (heart5 < 0) {
-            heart5 = 0;
-        }
-        if (heart5 > 5) {
-            heart5 = 5;
-        }
-        for (int i = 0; i < heart5; i++) {
-            heartLabels[4][i].setIcon(new ImageIcon(fullHeart));
-        }
+        JPanel textPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));//Adds text panel to bottom of actions page
+        stringText.setText(string);
+        stringText.setEditable(false);
+        stringText.setWrapStyleWord(true);
+        stringText.setLineWrap(true);
+        stringText.setPreferredSize(new Dimension(300, 20));
+        textPanel.add(stringText);
+        bottomPanel.add(textPanel, BorderLayout.CENTER);
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.gridheight = 5;
         gbc.fill = GridBagConstraints.BOTH;
-        centerPanel.add(picturePanel, gbc);
+        centerPanel.add(picturePanel, gbc);// Adds picture to first coloumn
         gbc.gridx = 2;
         gbc.fill = GridBagConstraints.VERTICAL;
-        centerPanel.add(gridPanel, gbc);
+        centerPanel.add(gridPanel, gbc); // Adds Heart Grid to second coloumn
         gbc.gridx = 3;
-        centerPanel.add(buttonPanel, gbc);
+        centerPanel.add(buttonPanel, gbc);// Adds button grid to third coloumn
         set();
     }
 
-    public void petSaveScreen() {
+    public void petSaveScreen() {//Save Slots with picture type
         clear();
         title.setText("Save Menu");
         titlePanel.add(title);
@@ -467,28 +400,40 @@ public class GUI extends JFrame implements Observer {
         set();
     }
 
-    public void clear() {
+    public void clear() {//Clears all the panels 
         frame.getContentPane().removeAll();
         centerPanel.removeAll();
         titlePanel.removeAll();
         title.removeAll();
         backPanel.removeAll();
+        bottomPanel.removeAll();
         slotPanel1.removeAll();
         slotPanel2.removeAll();
         slotPanel3.removeAll();
+        string = "";
     }
 
-    public void set() {
+    public void set() {//Sets the panels to the Frame for revalidation
         frame.setLayout(new BorderLayout());
         frame.add(backPanel, BorderLayout.NORTH);
         frame.add(centerPanel, BorderLayout.CENTER);
+        frame.add(bottomPanel, BorderLayout.SOUTH);
         frame.revalidate();
         frame.repaint();
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        
-        
+        if (o instanceof PetStatus) {//observer for changes in status values and pet type and name
+            PetStatus petStatus = (PetStatus) o;
+            statusText.setText(petStatus.toString());
+            petType = petStatus.getPetType();
+            petName = petStatus.getPetName();
+            hunger = petStatus.getHunger();
+            tired = petStatus.getTired();
+            hygiene = petStatus.getHygiene();
+            bored = petStatus.getBored();
+            sick = petStatus.getIllness();
+        }
     }
 }

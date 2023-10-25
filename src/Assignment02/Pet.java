@@ -1,6 +1,9 @@
 /*
 *Jamie Parker
 *20101511
+*Pet Class is a Model Object that sets up the String and Timestamp variables for the object.
+*Pet utilises observable to notify GUI of changes to the object
+*Pet consists of a constructor, get/setters, an age calculation function and a toString
  */
 package Assignment02;
 
@@ -15,12 +18,14 @@ public class Pet extends Observable {
     private Timestamp savedTime;
     private Timestamp firstCreated;
 
-    public Pet(String petType, String petColour, String petName, Timestamp savedTime, Timestamp firstCreated) {
+    public Pet(String petType, String petColour, String petName, Timestamp firstCreated, Timestamp savedTime) {
         this.petType = petType;
         this.petColour = petColour;
         this.petName = petName;
-        this.savedTime = savedTime;
         this.firstCreated = firstCreated;
+        this.savedTime = savedTime;
+        setChanged();
+        notifyObservers(this);
     }
 
     public String getPetType() {
@@ -30,7 +35,7 @@ public class Pet extends Observable {
     public void setPetType(String petType) {
         this.petType = petType;
         setChanged();
-        notifyObservers();
+        notifyObservers(petType);
     }
 
     public String getPetColour() {
@@ -40,7 +45,7 @@ public class Pet extends Observable {
     public void setPetColour(String petColour) {
         this.petColour = petColour;
         setChanged();
-        notifyObservers();
+        notifyObservers(petColour);
     }
 
     public String getPetName() {
@@ -50,9 +55,18 @@ public class Pet extends Observable {
     public void setPetName(String petName) {
         this.petName = petName;
         setChanged();
-        notifyObservers();
+        notifyObservers(petName);
+    }
+    
+    public void setFirstCreated(Timestamp firstCreated) {
+        this.firstCreated = firstCreated;
+        setChanged();
+        notifyObservers(firstCreated);
     }
 
+    public Timestamp getFirstCreated() {
+        return firstCreated;
+    }
     public Timestamp getSavedTime() {
         return savedTime;
     }
@@ -60,22 +74,12 @@ public class Pet extends Observable {
     public void setSavedTime(Timestamp savedTime) {
         this.savedTime = savedTime;
         setChanged();
-        notifyObservers();
-    }
-
-    public void setFirstCreated(Timestamp firstCreated) {
-        this.firstCreated = firstCreated;
-        setChanged();
-        notifyObservers();
-    }
-
-    public Timestamp getFirstCreated() {
-        return firstCreated;
+        notifyObservers(savedTime);
     }
 
     public String getAge() {
         String age = "No age to calculate";
-        if (this.getSavedTime() != null) {
+        if (this.getSavedTime() != null) {//Enusres that a pet object has previously been saved before calculating any meaningful age value
             TimeStamp timeStamp = new TimeStamp();
             Timestamp createdTime = this.getFirstCreated();
             Long difference = timeStamp.getTimeDifference(createdTime);
